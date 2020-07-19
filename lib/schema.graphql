@@ -5,21 +5,36 @@ enum Level {
   avanzado
 }
 
+union GlobalSearch  = Course | Student | Monitor
 
 type Course {
   _id: ID!
   title: String!
   teacher: String
   description: String!
-  topic: String
+  topic: String @deprecated
   people: [Student]
   level: Level
 }
 
-type Student {
+interface Person {
   _id: ID!
   name: String!
   email: String!
+}
+
+type Student implements Person {
+  _id: ID!
+  name: String!
+  email: String!
+  avatar: String
+}
+
+type Monitor implements Person {
+  _id: ID!
+  name: String!
+  email: String!
+  phone: String
 }
 
 type Query {
@@ -28,9 +43,11 @@ type Query {
   "Devuelve un curso"
   getCourse(id: ID!): Course
   "Devuelve todos los estudiantes"
-  getStudents: [Student]
-  "Devuelve un curso"
-  getStudent(id: ID!): Student
+  getPeople: [Person]
+  "Devuelve un estudiante"
+  getPerson(id: ID!): Person
+  "Ejecuta una busqueda global"
+  searchItems(keyword: String!) : [GlobalSearch]
 }
 
 input CourseInput {
@@ -49,14 +66,18 @@ input CourseEditInput {
 }
 
 
-input StudentInput {
+input PersonInput {
   name: String!
   email: String!
+  phone: String
+  avatar: String
 }
 
-input StudentEditInput {
+input PersonEditInput {
   name: String
   email: String
+  phone: String
+  avatar: String
 }
 
 type Mutation {
@@ -66,10 +87,10 @@ type Mutation {
   editCourse(_id: ID!, input: CourseEditInput): Course
   "Borrar un curso"
   deleteCourse(_id: ID!): String
-  "Crea un estudiante"
-  createStudent(input: StudentInput!): Student
-  "Edita un estudiante"
-  editStudent(_id: ID!, input: StudentEditInput): Student
+  "Crea una persona"
+  createPerson(input: PersonInput!): Person
+  "Edita una persona"
+  editPerson(_id: ID!, input: PersonEditInput): Person
   "Borra un estudiante"
   deleteStudent(_id: ID!): String
   "Agrega una persona a un curso"
